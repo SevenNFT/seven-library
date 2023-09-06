@@ -1,6 +1,7 @@
 # common - initialization, variables, functions
 
 # set make variables from project files
+organization = SevenNFT
 project = seven-library
 version := $(shell cat VERSION)
 src_dirs := ./contracts
