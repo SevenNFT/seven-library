@@ -12,7 +12,6 @@ tag = True
 [bumpversion:file:VERSION]
 search = {current_version}
 replace = {new_version}
-replace = version = "{new_version}"
 endef
 
 export BUMPVERSION_CFG
