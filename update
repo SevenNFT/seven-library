@@ -1,0 +1,100 @@
+#!/usr/bin/env python3
+
+#
+# update openzeppelin import files
+#
+from pathlib import Path
+from pprint import pprint
+from shutil import copyfile
+import sys
+import os
+import re
+
+OPEN_ZEPPELIN_DIR = os.environ.get('OPEN_ZEPPELIN_DIR', str(Path.home() / "src/openzeppelin-contracts/contracts"))
+
+def files(base, ret=None):
+    if ret is None:
+        ret=[]
+    base = Path(base).resolve()
+    for file in base.iterdir():
+        if file.is_file() and file.suffix.lower() == '.sol':
+            ret.append(file)
+        elif file.is_dir():
+            files(file, ret)
+    return ret
+
+def repo_sources():
+    base = Path('./contracts').resolve()
+    return [f.resolve() for f in Path(base).iterdir() if f.is_file() and f.suffix.lower() == '.sol']
+
+def oz_sources():
+    base = Path('./contracts/openzeppelin').resolve()
+    base.mkdir(parents=True, exist_ok=True)
+    return [f.resolve() for f in files(base)]
+
+
+def _imports(sources):
+    ret = []
+    pattern = r'^.*import[^"]*"([^"]*)";.*$'
+    for file in sources:
+        for line in file.open('r'):
+            m = re.match(pattern, line)
+            if m:
+                found = m.groups()[0]
+                ret.append(found)
+    return ret
+    
+
+def direct_imports():
+    base = Path('openzeppelin')
+    return [str(Path(i).relative_to(base)) for i in _imports(repo_sources()) if 'openzeppelin' in str(i)]
+
+def oz_imports():
+    ret = []
+    base = Path('contracts/openzeppelin').resolve()
+    for source in oz_sources():
+        for i in _imports([source]):
+            ret.append(str((source.parent / i).relative_to(base)))
+    return ret
+
+def _dump(label, data):
+    print(label)
+    pprint(data)
+    print
+
+def dump():
+    _dump("repo_sources:", repo_sources())
+    _dump("oz_sources:", oz_sources())
+    _dump("direct_imports:", direct_imports())
+    _dump("oz_imports:", oz_imports())
+
+def ozcopy(file):
+    base = Path('./contracts/openzeppelin').resolve()
+    source = Path(OPEN_ZEPPELIN_DIR) / str(file)
+    target = base / str(file)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    if not target.is_file(): 
+        print(str(target.relative_to(base.parent)))
+        copyfile(source, target)
+        return True
+    return False
+
+def copy_direct_imports():
+    for file in direct_imports():
+        ozcopy(file)
+
+def copy_oz_imports():
+    copied=False
+    for file in oz_imports():
+        if ozcopy(file):
+            copied=True
+    return copied
+
+def main():
+    copy_direct_imports()
+    while copy_oz_imports():
+        pass
+    return 0
+
+if __name__ == '__main__':
+    sys.exit(main())

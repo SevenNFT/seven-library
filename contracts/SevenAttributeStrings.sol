@@ -5,9 +5,9 @@
 
 pragma solidity ^0.8.4;
 
-import "@openzeppelin/utils/ShortStrings.sol";
-import "@openzeppelin/utils/Strings.sol";
-import "@openzeppelin/utils/structs/EnumerableMap.sol";
+import "./openzeppelin/utils/ShortStrings.sol";
+import "./openzeppelin/utils/Strings.sol";
+import "./openzeppelin/utils/structs/EnumerableMap.sol";
 
 library SevenAttributeStrings {
 

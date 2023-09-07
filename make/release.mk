@@ -12,7 +12,7 @@ $(tarball):
 
 tarball: .tarball
 
-release: tarball
+.release: .tarball
 ifeq "$(version)" "$(subst v,,$(shell $(github) release view --json name --jq .name))"
 	@echo version $(version) is already released
 else
@@ -20,6 +20,8 @@ else
 	$(github) release upload v$(version) $(tarball)
 endif
 	@touch $@
+
+release: .release 
 
 release-clean:
 	rm -f .release

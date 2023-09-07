@@ -5,8 +5,8 @@
 
 pragma solidity ^0.8.4;
 
-import "@openzeppelin/utils/structs/EnumerableMap.sol";
 import "./SevenAttributeStrings.sol";
+import "./openzeppelin/utils/structs/EnumerableMap.sol";
     
 library SevenTransformations {
 
