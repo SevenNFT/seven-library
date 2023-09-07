@@ -4,8 +4,9 @@ github = gh -R $(organization)/$(project)
 
 tarball = dist/$(project)-$(version).tgz
 
+
 $(tarball): 
-	tar zcf $@ .
+	tar zcf $@ --exclude-from tar.exclude .
 
 .tarball: $(tarball)
 	@touch $@
